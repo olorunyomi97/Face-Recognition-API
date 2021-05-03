@@ -43,20 +43,15 @@ app.get('/', (req, res) => {
 
 // Sign In //
 app.post('/signin', (req, res) => {
-    // Load hash from your password DB.
-    bcrypt.compare("cheese", '$2a$10$A5ht3gNDnm/dPqrA6hxm6uMCbgtjZEYeU2qWtMiR2/E7lBu3.444q', function(err, res) {
-        console.log('first guess', res)
-    });
-    bcrypt.compare("veggies", '$2a$10$A5ht3gNDnm/dPqrA6hxm6uMCbgtjZEYeU2qWtMiR2/E7lBu3.444q', function(err, res) {
-        console.log('second guess', res)
-    });
     if (req.body.email === database.users[0].email &&
         req.body.password === database.users[0].password) {
         res.json('success');
-    }else {
-        res.status(400).json('error signing in')
+        // res.json(database.users[0]);
+    } else {
+        res.status(400).json('error logging in')
     }
 })
+
 
 // Register //
 app.post('/register', (req, res) => {
@@ -89,7 +84,7 @@ app.get('/profile/:id', (req, res) => {
 
 
 // Get Image ID //
-app.post('/image', (req,res) => {
+app.put('/image', (req,res) => {
     const { id } = req.body;
     let found = false;
     database.users.forEach(user => {
@@ -114,6 +109,13 @@ app.post('/image', (req,res) => {
 // });
 // bcrypt.compare("veggies", hash, function(err, res) {
 //     // res = false
+// });
+ // Load hash from your password DB.
+//  bcrypt.compare("cheese", '$2a$10$A5ht3gNDnm/dPqrA6hxm6uMCbgtjZEYeU2qWtMiR2/E7lBu3.444q', function(err, res) {
+//     console.log('first guess', res)
+// });
+// bcrypt.compare("veggies", '$2a$10$A5ht3gNDnm/dPqrA6hxm6uMCbgtjZEYeU2qWtMiR2/E7lBu3.444q', function(err, res) {
+//     console.log('second guess', res)
 // });
 
 
