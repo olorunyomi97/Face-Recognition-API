@@ -2,7 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
+const knex = require('knex');
 
+const postgres = knex({
+    client: 'pg',
+    connection: {
+      host : '127.0.0.1',
+      user : 'biggie',
+      password : '',
+      database : 'smart-brain'
+    }
+  });
+
+  console.log(postgres.select('*').from('users'));
 const app = express();
 
 app.use(bodyParser.json());
@@ -98,25 +110,6 @@ app.put('/image', (req,res) => {
         res.status(400).json('user not found');
     }
 })
-
-// bcrypt.hash(password, null, null, function(err, hash) {
-//     // Store hash in your password DB.
-//     console.log(hash)
-// });
-// // Load hash from your password DB.
-// bcrypt.compare("bacon", hash, function(err, res) {
-//     // res == true
-// });
-// bcrypt.compare("veggies", hash, function(err, res) {
-//     // res = false
-// });
- // Load hash from your password DB.
-//  bcrypt.compare("cheese", '$2a$10$A5ht3gNDnm/dPqrA6hxm6uMCbgtjZEYeU2qWtMiR2/E7lBu3.444q', function(err, res) {
-//     console.log('first guess', res)
-// });
-// bcrypt.compare("veggies", '$2a$10$A5ht3gNDnm/dPqrA6hxm6uMCbgtjZEYeU2qWtMiR2/E7lBu3.444q', function(err, res) {
-//     console.log('second guess', res)
-// });
 
 
 app.listen(3000, ()=> {
