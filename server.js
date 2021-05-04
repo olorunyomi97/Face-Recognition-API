@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const database = {
-    // Dummy Database for now//
+    // Dummy Database for now/
     users: [
         {
             id: '123',
