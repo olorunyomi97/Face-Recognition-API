@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 const knex = require('knex');
 
-const postgres = knex({
+const db = knex({
     client: 'pg',
     connection: {
       host : '127.0.0.1',
@@ -13,12 +13,9 @@ const postgres = knex({
       database : 'smart-brain'
     }
   });
-
-  console.log(postgres.select('*').from('users'));
+ 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(cors());
 
 const database = {
     // Dummy Database for now/
@@ -49,6 +46,9 @@ const database = {
     ]
 }
 
+app.use(bodyParser.json());
+app.use(cors());
+
 app.get('/', (req, res) => {
     res.send(database.users)
 })
@@ -69,14 +69,17 @@ app.post('/signin', (req, res) => {
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
   
-    database.users.push({
-        id: '511',
-        name: name,
+    db('users')
+    .returning('*')
+    .insert({
         email: email,
-        entries: 0,
+        name: name,
         joined: new Date()
     })
-    res.json(database.users[database.users.length-1]);
+    .then(user => {
+        res.json(user[0]);
+    })
+    .catch(err => res.status(400).json('email and password already esixts'))
 })
 
 // Get UserID //
