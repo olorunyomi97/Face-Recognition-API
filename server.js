@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 const knex = require('knex');
 
+const register = require('./controllers/register');
+const signin = require('./controllers/signin');
+
 const db = knex({
     client: 'pg',
     connection: {
@@ -17,35 +20,6 @@ const db = knex({
 const app = express();
 
 
-// const database = {
-//     // Dummy Database for now/
-//     users: [
-//         {
-//             id: '123',
-//             name: 'Cole',
-//             email: 'cole@gmail.com',
-//             password: 'bit',
-//             entries: 0,
-//             joined: new Date()
-//         },
-//         {
-//             id: '619',
-//             name: 'Chuck',
-//             email: 'chuck@gmail.com',
-//             password: 'bits',
-//             entries: 0,
-//             joined: new Date()
-//         },
-//     ],
-//     login: [
-//         {
-//             id: '305',
-//             hash: '',
-//             email: 'cole@gmail.com'
-//         }
-//     ]
-// }
-
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -54,54 +28,10 @@ app.get('/', (req, res) => {
 })
 
 // Sign In //
-app.post('/signin', (req, res) => {
-   db.select('email', 'hash').from('login')
-   .where('email', '=' , req.body.email)
-   .then(data => {
-       const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
-        if (isValid) {
-           return db.select('*').from('users')
-           .where('email', '=', req.body.email)
-           .then(user => {
-            res.json(user[0])
-           })
-           .catch(err => res.status(400).json('unable to get user'))
-       } else {
-            res.status(400).json('wrong password')
-       }
-   })
-   .catch(err => res.status(400).json('wrong credentials'))
-})
-
+app.post('/signin', (req, res) => { signin.handleSignin (req, res, db, bcrypt)})
 
 // Register //
-app.post('/register', (req, res) => {
-    const { name, email, password } = req.body;
-    const hash = bcrypt.hashSync(password);
-    db.transaction(trx => {
-        trx.insert({
-            hash: hash,
-            email:email
-        })
-        .into('login')
-        .returning('email')
-        .then(loginEmail => {
-            return trx('users')
-            .returning('*')
-            .insert({
-                email: loginEmail[0],
-                name: name,
-                joined: new Date()
-            })
-            .then(user => {
-                res.json(user[0]);
-            })
-        })
-        .then(trx.commit)
-        .catch(trx.rollback)
-    })
-    .catch(err => res.status(400).json('email and password already esixts'))
-})
+app.post('/register', (req, res) =>  { register.handleRegister (req, res, db, bcrypt)})
 
 // Get UserID //
 app.get('/profile/:id', (req, res) => {
@@ -115,9 +45,6 @@ app.get('/profile/:id', (req, res) => {
         }
     })
     .catch(err => res.status(400).json('error getting user'))
-    // if(!found) {
-    //     res.status(400).json('user not found');
-    // }
 })
 
 
